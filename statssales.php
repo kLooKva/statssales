@@ -102,9 +102,9 @@ class statssales extends ModuleGraph
 				<div class="row">
 					<div class="col-lg-4 col-lg-offset-7">
 						<select name="id_country">
-							<option value="0"'.((!Tools::getValue('id_order_state')) ? ' selected="selected"' : '').'>'.$this->trans('All countries', array(), 'Admin.Global').'</option>';
+							<option value="0"'.((!(int)Tools::getValue('id_country')) ? ' selected="selected"' : '').'>'.$this->trans('All countries', array(), 'Admin.Global').'</option>';
         foreach (Country::getCountries($this->context->language->id) as $country) {
-            $this->html .= '<option value="'.$country['id_country'].'"'.(($country['id_country'] == Tools::getValue('id_country')) ? ' selected="selected"' : '').'>'.$country['name'].'</option>';
+            $this->html .= '<option value="'.(int)$country['id_country'].'"'.(((int)$country['id_country'] === (int)Tools::getValue('id_country')) ? ' selected="selected"' : '').'>'.Tools::safeOutput($country['name']).'</option>';
         }
         $this->html .= '</select>
 					</div>
@@ -201,7 +201,9 @@ class statssales extends ModuleGraph
 
     public function setOption($options, $layers = 1)
     {
-        list($this->option, $this->id_country) = explode('-', $options);
+        list($this->option, $this->id_country) = array_pad(explode('-', (string)$options, 2), 2, 0);
+        $this->option = (int)$this->option;
+        $this->id_country = (int)$this->id_country;
         switch ($this->option) {
             case 1:
                 $this->_titles['main'][0] = $this->trans('Orders placed', array(), 'Modules.Statssales.Admin');
